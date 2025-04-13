@@ -16,23 +16,22 @@ echo "Connected successfully";
 $conn->select_db($db);
 
 
-$city = trim($_POST['city']);
-$city = ucfirst(strtolower($city)); // Normalize city format
+$city = trim($_POST['city']); // gets names and trim spaces
+$city = ucfirst(strtolower($city)); // all lowercase but first letter uppercase
 
-// check if city already exists
+// SQL query - check if city already exists
 $stmt = $conn->prepare("SELECT count FROM cities WHERE name = ?");
 $stmt->bind_param("s", $city);
 $stmt->execute();
 $result = $stmt->get_result();
 
-if ($result->num_rows > 0) {
-    // City exists – increment count
+
+if ($result->num_rows > 0) {   // if city exiists: count +1
     $stmt = $conn->prepare("UPDATE cities SET count = count + 1 WHERE name = ?");
     $stmt->bind_param("s", $city);
     $stmt->execute();
     echo "Updated search count for $city.";
-} else {
-    // City does not exist – insert new
+} else {    // if city does not exists: insert into database
     $stmt = $conn->prepare("INSERT INTO cities (name) VALUES (?)");
     $stmt->bind_param("s", $city);
     $stmt->execute();
