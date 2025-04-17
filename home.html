@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Two Column Layout</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh; 
+    }
+
+    .left-column, .right-column {
+      padding: 20px;
+      box-sizing: border-box;
+      height: 100%;
+    }
+
+    .left-column {
+      flex: 7;
+      background-color: #EDF2F4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .right-column {
+      flex: 3;
+      background-color: #0496FF;
+    }
+
+    .titleBox {
+    background-color: #006BA6;
+    padding: 30px;
+    border-radius: 15px;
+    height: 90%;
+    width: 90%;
+    text-align: left;
+
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    }
+
+    .logoContainer {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    }
+
+    .titleBottom {
+    align-self: flex-end; 
+    margin-top: auto;     
+    }
+
+
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left-column">
+      <div class="titleBox">
+        <div class="logoContainer">
+            <p> Logo Here </p>
+        </div>
+        <div class="titleBottom">
+            <h2> Welcome to TravelBuddy </h2>
+        </div>
+      </div>
+    </div>
+    <div class="right-column">
+      <h2>Top Searches Today</h2>
+      <p>This is the right side of the page.</p>
+    </div>
+  </div>
+</body>
+</html>
