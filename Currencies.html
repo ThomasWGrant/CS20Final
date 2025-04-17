@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>City Info & USD Exchange</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background-color: #f0f0f0;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 5px;
+    }
+    #result {
+      background: white;
+      padding: 20px;
+      margin-top: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    img {
+      width: 100px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>City → Country Info + USD Exchange</h1>
+  <input type="text" id="city" placeholder="Enter a city (e.g. Tokyo)" />
+  <button onclick="getCityInfo()">Get Info</button>
+
+  <div id="result"></div>
+
+  <script>
+    const GEOCODE_API_KEY = '98ccd8ec75b04bccab4a9eed9701c952';
+
+    async function getCountryCode(city) {
+      const res = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(city)}&key=${GEOCODE_API_KEY}`);
+      const data = await res.json();
+      return data.results[0]?.components?.country_code?.toUpperCase() || null;
+    }
+
+    async function getCountryDetails(code) {
+      const res = await fetch(`https://restcountries.com/v3.1/alpha/${code}`);
+      const data = await res.json();
+      return data[0];
+    }
+
+    async function getExchangeRate(currencyCode) {
+      const res = await fetch("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json");
+      const data = await res.json();
+      return data.usd[currencyCode.toLowerCase()];
+    }
+
+    async function getCityInfo() {
+      const city = document.getElementById("city").value.trim();
+      const resultBox = document.getElementById("result");
+      resultBox.innerText = "Loading...";
+
+      if (!city) {
+        resultBox.innerText = "Please enter a city.";
+        return;
+      }
+
+      try {
+        const countryCode = await getCountryCode(city);
+        if (!countryCode) {
+          resultBox.innerText = "Could not find country for that city.";
+          return;
+        }
+
+        const country = await getCountryDetails(countryCode);
+
+        const capital = country.capital?.[0] || "N/A";
+        const timezones = country.timezones?.join(', ') || "N/A";
+        const flag = country.flags?.png || "";
+        const name = country.name?.common || "Unknown";
+        const languages = country.languages ? Object.values(country.languages).join(', ') : "N/A";
+
+        const currencyCode = country.currencies ? Object.keys(country.currencies)[0] : null;
+        const currencyName = currencyCode ? country.currencies[currencyCode]?.name : "Unknown";
+        const exchangeRate = currencyCode ? await getExchangeRate(currencyCode) : null;
+
+        resultBox.innerHTML = `
+          <h2>${name} (${countryCode})</h2>
+          <p><strong>Capital:</strong> ${capital}</p>
+          <p><strong>Languages:</strong> ${languages}</p>
+          <p><strong>Timezones:</strong> ${timezones}</p>
+          <p><strong>Currency:</strong> ${currencyName} (${currencyCode})</p>
+          <p><strong>Exchange Rate:</strong> 1 USD = ${exchangeRate ?? "N/A"} ${currencyCode}</p>
+          <img src="${flag}" alt="Flag of ${name}">
+        `;
+      } catch (err) {
+        resultBox.innerText = "Something went wrong.";
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
