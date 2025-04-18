@@ -36,33 +36,54 @@
     }
 
     .titleBox {
-    background-color: #006BA6;
-    padding: 30px;
-    border-radius: 15px;
-    height: 90%;
-    width: 90%;
-    text-align: left;
+        background-color: #006BA6;
+        padding: 30px;
+        border-radius: 15px;
+        height: 90%;
+        width: 90%;
+        text-align: left;
 
-    position: relative;
+        position: relative;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; 
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;     /* align items to the right */
+        justify-content: flex-end; /* optional, but helps if it grows */
+        margin-top: auto;
+        
     }
 
     .logoContainer {
-    position: absolute;
-    top: 20px;
-    left: 20px;
+        position: absolute;
+        top: 20px;
+        left: 20px;
+    }
+    
+    .titleBottom {
+        position: absolute;
+        bottom: 20px;
+        right: 40px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
     }
 
-    .titleBottom {
-    align-self: flex-end; 
-    margin-top: auto;     
+    .titleBottom h2 {
+        font-size: 60px;
+        margin: 0 0 30px 0;
+        text-align: right;
+        color: #fff; 
     }
 
     .startSearching{
-        
+        background-color: #fff;
+        color: #DB6274;
+        border-radius: 8px; 
+        border: none;
+        font-size: 24px;
+        margin: 0 0 30px 0;
+
     }
 
 
