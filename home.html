@@ -31,9 +31,15 @@
     }
 
     .right-column {
-      flex: 3;
-      background-color: #0496FF;
+        flex: 3;
+        background-color: #0496FF;
+        display: flex;
+        flex-direction: column; /* Stack items vertically */
+        align-items: right;    /* Optional: center the .topSearch box */
+        padding: 40px;     /* Optional: more space around */
+        box-sizing: border-box;
     }
+
 
     .titleBox {
         background-color: #006BA6;
@@ -82,10 +88,20 @@
         border-radius: 8px; 
         border: none;
         font-size: 24px;
+        padding: 20px;
         margin: 0 0 30px 0;
 
     }
 
+    .topSearch {
+        background-color: #006BA6;
+        padding: 30px;
+        border-radius: 15px;
+        height: 90%;
+        width: 90%;
+        text-align: left;
+ 
+    }
 
   </style>
 </head>
@@ -104,7 +120,9 @@
     </div>
     <div class="right-column">
       <h2>Top Searches Today</h2>
-      <p>This is the right side of the page.</p>
+      <div class="topSearch">
+
+      </div>
     </div>
   </div>
 </body>
