@@ -40,6 +40,11 @@
         box-sizing: border-box;
     }
 
+    .right-column h2 {
+        margin-top: 0px;
+        color: #fff;
+    }
+
 
     .titleBox {
         background-color: #006BA6;
@@ -90,15 +95,22 @@
         font-size: 24px;
         padding: 20px;
         margin: 0 0 30px 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
 
     }
+
+    .startSearching:hover {
+        transform: scale(1.05);    /* subtle grow effect */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
 
     .topSearch {
         background-color: #006BA6;
         padding: 30px;
         border-radius: 15px;
-        height: 90%;
-        width: 90%;
+        height: 20%;
+        width: 85%;
         text-align: left;
  
     }
@@ -114,12 +126,23 @@
         </div>
         <div class="titleBottom"> 
             <h2> Welcome to TravelBuddy </h2>
-            <button class="startSearching"> Start Searching &rarr;</button>
+            <a href="main.html">
+                <button class="startSearching">Start Searching &rarr;</button>
+            </a>
+              
         </div>
       </div>
     </div>
     <div class="right-column">
       <h2>Top Searches Today</h2>
+      <div class="topSearch">
+
+      </div>
+      <br> 
+      <div style = "background-color: #FFBC42" class="topSearch">
+
+      </div>
+      <br> 
       <div class="topSearch">
 
       </div>
