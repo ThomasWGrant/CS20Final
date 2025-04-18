@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>City-to-Airport Flight Search</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f9ff;
+      padding: 20px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #results {
+      margin-top: 20px;
+    }
+    .flight {
+      background: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Roundtrip Flight Search</h1>
+
+  <label>Origin City:</label>
+  <input type="text" id="originCity" placeholder="e.g. New York" />
+
+  <label>Destination City:</label>
+  <input type="text" id="destinationCity" placeholder="e.g. Tokyo" />
+  <br>
+
+  <label>Departure Date:</label>
+  <input type="date" id="departureDate" />
+
+  <label>Return Date:</label>
+  <input type="date" id="returnDate" />
+  <br>
+
+  <button onclick="searchRoundtrip()">Search Roundtrip Flights</button>
+
+  <div id="results"></div>
+
+  <script>
+    const amadeusClientId = "ANxugNc92RjrJmywFKj9sDfgRLzGLuUy";
+    const amadeusClientSecret = "PguWleNiHdeSZ1qt";
+    const ninjaKey = "rkqDA5p5O+OkGYL8KqZD6w==M8RLNxfvcj590v7E";
+
+    async function getAccessToken() {
+      const res = await fetch("https://test.api.amadeus.com/v1/security/oauth2/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          grant_type: "client_credentials",
+          client_id: amadeusClientId,
+          client_secret: amadeusClientSecret
+        })
+      });
+      const data = await res.json();
+      return data.access_token;
+    }
+
+    async function getAirportCodeFromCity(cityName) {
+      const knownCities = {
+        "boston": "BOS",
+        "new york": "JFK",
+        "los angeles": "LAX",
+        "san francisco": "SFO",
+        "chicago": "ORD",
+        "london": "LHR",
+        "paris": "CDG",
+        "tokyo": "NRT",
+        "madrid": "MAD",
+        "rome": "FCO",
+        "toronto": "YYZ",
+        "berlin": "BER",
+        "dubai": "DXB",
+        "delhi": "DEL",
+        "cairo": "CAI"
+      };
+
+      const lower = cityName.toLowerCase();
+      if (knownCities[lower]) {
+        return knownCities[lower];
+      }
+
+      const response = await fetch(`https://api.api-ninjas.com/v1/airports?city=${encodeURIComponent(cityName)}`, {
+        headers: {
+          'X-Api-Key': ninjaKey
+        }
+      });
+
+      const data = await response.json();
+      if (data && data.length > 0) {
+        return data[0].iata;
+      } else {
+        return null;
+      }
+    }
+
+    async function fetchLowestPrice(token, origin, destination, date) {
+      const url = `https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=${origin}&destinationLocationCode=${destination}&departureDate=${date}&adults=1`;
+
+      const res = await fetch(url, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const data = await res.json();
+      if (!data.data || data.data.length === 0) return null;
+
+      const prices = data.data.map(f => parseFloat(f.price.total));
+      return Math.min(...prices);
+    }
+
+    async function searchRoundtrip() {
+      const originCity = document.getElementById("originCity").value.trim();
+      const destinationCity = document.getElementById("destinationCity").value.trim();
+      const departureDate = document.getElementById("departureDate").value;
+      const returnDate = document.getElementById("returnDate").value;
+      const resultsDiv = document.getElementById("results");
+
+      if (!originCity || !destinationCity || !departureDate || !returnDate) {
+        resultsDiv.innerHTML = "<p style='color: red;'>Please fill out all fields.</p>";
+        return;
+      }
+
+      try {
+        const token = await getAccessToken();
+        const origin = await getAirportCodeFromCity(originCity);
+        const destination = await getAirportCodeFromCity(destinationCity);
+
+        if (!origin && !destination) {
+            alert(`Sorry, we couldn't find airports for either city. Please enter major cities with airports.`);
+            return;
+        }
+        if (!origin) {
+            alert(`Sorry, we couldn't find an airport for "${originCity}". Please enter a major city with an airport.`);
+            return;
+        }
+        if (!destination) {
+            alert(`Sorry, we couldn't find an airport for "${destinationCity}". Please enter a major city with an airport.`);
+            return;
+        }
+
+
+        resultsDiv.innerHTML = `Searching flights from ${origin} ➝ ${destination} and back...`;
+
+        const outboundMin = await fetchLowestPrice(token, origin, destination, departureDate);
+        const returnMin = await fetchLowestPrice(token, destination, origin, returnDate);
+
+        if (outboundMin === null || returnMin === null) {
+          resultsDiv.innerHTML = "<p>No flights found in one or both directions.</p>";
+          return;
+        }
+
+        const totalMin = (outboundMin + returnMin).toFixed(2);
+
+        resultsDiv.innerHTML = `
+          <div class="flight">
+            <strong>Best Roundtrip Price:</strong><br>
+            From <b>${originCity}</b> to <b>${destinationCity}</b><br>
+            Departing: ${departureDate}<br>
+            Returning: ${returnDate}<br><br>
+            Starting from <strong>$${totalMin}</strong>
+          </div>
+        `;
+      } catch (err) {
+        console.error(err);
+        resultsDiv.innerHTML = "<p style='color: red;'>Error searching flights. Check console for details.</p>";
+      }
+    }
+  </script>
+
+</body>
+</html>
